@@ -70,7 +70,8 @@ metadata <- read.csv("2018-MetabotypingPaper/DataInfo_S013.csv")
 
 ## Creación del repositorio Github. PENDIENTE DE FINALIZAR.
 Primeramente, se ha creado un usuario con el correo de la UOC y se ha creado un nuevo repositorio online llamado "Canseco-i-Ribas-Joan-PEC1". 
-Dentro del directorio local del proyecto (donde hay todos los documentos que se han ido mencionando en la parte de "Materiales y Métodos"), se ha creado primeramente un proyecto de R, para facilitar el trabajo con estos documentos. Posteriormente, y desde la Terminal de Rstudio, se ha creado un repositorio local Git usando el comando "git init". Después se ha establecido conexión con el repositorio online con "git remote add origin https://github.com/CansecoUOC/Canseco-i-Ribas-Joan-PEC1.git". Añadimos los documentos 
+Dentro del directorio local del proyecto (donde hay todos los documentos que se han ido mencionando en la parte de "Materiales y Métodos"), se ha creado primeramente un proyecto de R, para facilitar el trabajo con estos documentos. Posteriormente, y desde la Terminal de Rstudio, se ha creado un repositorio local Git usando el comando "git init". Después se ha establecido conexión con el repositorio online con "git remote add origin https://github.com/CansecoUOC/Canseco-i-Ribas-Joan-PEC1.git". Se han añadido todos los documentos al área de ensayo con "git add ." y se ha hecho el primer commit con "git commit -m 'Primer commit del proyecto'". Seguidamente, se han enviado todos los documentos del repositorio local al repositorio online con "git push origin master".
+Una vez están los repositorios han sido vinculados, ya se pueden ir haciendo commits del proyecto a medida que se van haciendo cambios.
 
 # Resultados
 

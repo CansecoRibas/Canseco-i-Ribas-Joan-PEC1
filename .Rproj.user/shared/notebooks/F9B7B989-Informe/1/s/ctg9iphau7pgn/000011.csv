@@ -1,5 +1,0 @@
-"0","# Instalamos el paquete."
-"0","if (!requireNamespace(""SummarizedExperiment"", quietly = TRUE)) BiocManager::install(""SummarizedExperiment"")"
-"0",""
-"0","# Llamamos el paquete."
-"0","library(""SummarizedExperiment"")"
