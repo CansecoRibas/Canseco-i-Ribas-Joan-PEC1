@@ -12,7 +12,10 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Abstract
+# Abstract PENDIENTE
+En este proyecto, se ha llevado a cabo un análisis estructurado de datos metabolómicos para simular un proceso de análisis ómico. El objetivo ha sido familiarizarse con la organización y manejo de datos ómicos, aplicando diversas herramientas y métodos que se han ido mostrando durante la asignatura de "Análisis de datos ómicos". Para ello, se ha seleccionado un conjunto de datos de un estudio en el que se investiga los metabolitos en respuesta a la cirugía bariátrica en 4 distintos timepoints en 39 pacientes.
+Estos datos han sido organizados en un contenedor del tipo SummarizedExperiment para facilitar el trabajo con este dataset. Además, se han realizado análisis exploratorios del dataset en el que se ha reflejado...
+Finalmente, se ha creado un repositorio del proyecto en Github donde se han subido todos los documentos del proyecto.
 
 # Objetivos del estudio
 Los objetivos generales de esta actividad son planificar y ejecutar una versión simplificada del proceso de análisis de datos ómicos, utilizando algunas de las herramientas y métodos que se han trabajado en la unidad. En concreto, se deberá:
@@ -20,7 +23,7 @@ Los objetivos generales de esta actividad son planificar y ejecutar una versión
 - Crear un contenedor del tipo *SummarizedExperiment* que contenga los datos y metadatos del dataset.
 - Llevar a cabo una exploración del dataset que dé una visión general del mismo.
 - Elaborar un informe que describa el proceso realizado (este documento).
-- Crear un repositorio en Github y subir el informe, el objeto contenedor con los datos y metadatos, el código R para la exploración de los datos, los datos en formato texto y los metadatos en un archivo markdown.
+- Crear un repositorio en Github y subir el informe, el objeto contenedor con los datos y metadatos, el código R para la exploración de los datos, los datos y los metadatos.
 
 
 # Materiales y Métodos
@@ -28,9 +31,8 @@ Esta actividad se ha desarrollado desde un ordenador Windows.
 
 ## Origen y naturaleza de los datos
 Los datos analizados han sido extraídos del siguiente repositorio online: <https://github.com/nutrimetabolomics/metaboData/>
-
 Una vez accedemos a dicho repositorio, clicamos el botón verde "<> Code", y clicamos la opción "Download ZIP". Una vez se ha descargado el repositorio en nuestro ordenador, clicamos botón derecho y seleccionamos "Extraer todo". Exploramos los distintos datasets y seleccionamos el dataset "2018-MetabotypingPaper" porque tiene los documentos bien estructurados y parece que se puede trabajar bien con él. Cogemos los documentos de dicho dataset y los llevamos a nuestro directorio de trabajo de la PEC1. 
-Se trata de un dataset usado para un estudio en el que se investiga los metabolitos en respuesta a la cirugía bariátrica.
+Se trata de un dataset de un estudio en el que se investiga los metabolitos en respuesta a la cirugía bariátrica en 4 distintos timepoints.
 
 ## Herramientas informáticas
 Se han usado principalmente 3 herramientas informáticas y bioinformáticas para la resolución de la PEC1:
@@ -39,7 +41,25 @@ Se han usado principalmente 3 herramientas informáticas y bioinformáticas para
 - Github: Se ha usado para la descarga de los datos (ya se ha indicado en la sección previa el procedimiento realizado), y se ha usado para presentar los resultados complementarios de la PEC1.
 
 ## Creación de un contenedor del tipo SummarizedExperiment
-Para la creación del contenedor se ha usado Bioconductor dentro de R (como se ha especificado anteriormente), por lo que el primer paso será asegurarnos de que "BiocManager" está instalado:
+Para la creación del contenedor se ha usado Bioconductor dentro de R (como se ha especificado anteriormente). Los pasos se han especificado en el apartado de Resultados.
+
+## Exploración del dataset
+Para la exploración de los datos se usará principalmente R y Rstudio. Se usará en este proyecto dos documentos:
+- "DataValues_S013.csv": Se trata del documento donde hay almacenados los datos experimentales de los pacientes. Es un data frame con 39 filas (de 39 pacientes) y 696 variables. De las 696 variables, las 6 primeras son para identificar a los pacientes (X.1, SUBJECTS, SURGERY, AGE, GENDER y Group, en la que X.1 es un duplicado de SUBJECTS, por lo que realmente se podría considerar solo las 5 primeras columnas), y el resto de variables son los metabolitos tomados en 4 timepoints distintos (T0, T2, T4 y T5). Se denota a qué timepoint hace referencia cada variable porque al final del nombre de cada variable hay especificado el timepoint al que pertenecen con "_TX" (donde X es 0, 2, 4 o 5).
+- "DataInfo_S013.csv": Se trata de un documento donde hay la metadata del documento anterior y está organizado de manera distinta. Tiene solo 4 columnas (X, es un duplicado de VarName, VarName, contiene el nombre de cada una de las variables del documento anterior, varTpe, especifica el tipo de variable que es, y Description, especifica qué información se recoge en cada variable) y 695 filas, correspondientes a las 695 variables del documento anterior (recordemos que eran 696 pero la primera columna era un duplicado de la segunda columna, por lo que son 695 efectivas).
+Una exploración más exhaustiva será llevada a cabo en el apartado de Resultados.
+
+## Creación del repositorio Github
+Primeramente, se ha creado un nuevo repositorio online llamado "Canseco-i-Ribas-Joan-PEC1" desde el usuario "CansecoRibas". 
+Dentro del directorio local del proyecto (donde hay todos los documentos que se han ido mencionando en la parte de "Materiales y Métodos"), se ha creado primeramente un proyecto de R, para facilitar el trabajo con estos documentos. Posteriormente, y desde la Terminal de Rstudio, se ha creado un repositorio local Git usando el comando "git init". Después se ha establecido conexión con el repositorio online con "git remote add origin https://github.com/CansecoRibas/Canseco-i-Ribas-Joan-PEC1.git". Se han añadido todos los documentos al área de ensayo con "git add ." y se ha hecho el primer commit con "git commit -m 'Primer commit del proyecto'". Seguidamente, se han enviado todos los documentos del repositorio local al repositorio online con "git push origin master".
+Una vez se han vinculados los repositorios, se han ido haciendo commits a medida que se ha ido avanzando en el proyecto.
+Se puede acceder al repositorio online desde: <https://github.com/CansecoRibas/Canseco-i-Ribas-Joan-PEC1>
+
+# Resultados
+En este apartado se volcarán los resultados del proyecto.
+
+## Creación del contenedor del tipo SummarizedExperiment
+El primer paso será asegurarnos de que "BiocManager" está instalado:
 ```{r}
 # Instalamos el paquete.
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
@@ -63,16 +83,49 @@ data_values <- read.csv("2018-MetabotypingPaper/DataValues_S013.csv")
 metadata <- read.csv("2018-MetabotypingPaper/DataInfo_S013.csv")
 ```
 
+Obsevamos estos dos archivos. Posteriormente ya se hará una mejor exploración de los datos en próximos apartados.
+```{r}
+# Vemos qué pinta tienen.
+data_values
+metadata
+```
+
+En estos dos documentos hay dos variables iniciales que sobran, ya que son duplicaciones de las columnas adyacentes. Estas columnas son X.1 en "DataValues_S013.csv" y X en "DataInfo_S013.csv", por lo que las vamos a eliminar para que no nos molesten.
+```{r}
+# Eliminamos ambas columnas.
+data_values_mod <- data_values[, 2:696]
+metadata_mod <- metadata[, 2:4]
+```
 
 
+Vemos que hay algunas variables identificativas (las 5 primeras) en el documento "DataValues_S013.csv" y el resto son variables experimentales. En el documento "DataInfo_S013.csv" se recoge información de las variables del documento "DataValues_S013.csv". Algunas de las variables son las mismas pero en distintos timepoints por lo que vamos a crear una nueva variable que especifique el timepoint. A partir de esta información vamos a crear el objeto "SummarizedExperiment".
+```{r}
+# Seleccionamos las variables experimentales y creamos una matriz transpuesta, ya que las filas deben ser las variables y las columnas deben ser las distintas muestras (en este caso pacientes).
+metabolite_data <- t(as.matrix(data_values_mod[, 6:ncol(data_values_mod)]))
 
-## Exploración del dataset
+# Creamos rowData a partir de la información de la metadata para especificar la información de las variables experimentales.
+rowData <- metadata_mod[6:nrow(metadata_mod), ]
 
-## Creación del repositorio Github. PENDIENTE DE FINALIZAR.
-Primeramente, se ha creado un usuario con el correo de la UOC y se ha creado un nuevo repositorio online llamado "Canseco-i-Ribas-Joan-PEC1". 
-Dentro del directorio local del proyecto (donde hay todos los documentos que se han ido mencionando en la parte de "Materiales y Métodos"), se ha creado primeramente un proyecto de R, para facilitar el trabajo con estos documentos. Posteriormente, y desde la Terminal de Rstudio, se ha creado un repositorio local Git usando el comando "git init". Después se ha establecido conexión con el repositorio online con "git remote add origin https://github.com/CansecoUOC/Canseco-i-Ribas-Joan-PEC1.git". Se han añadido todos los documentos al área de ensayo con "git add ." y se ha hecho el primer commit con "git commit -m 'Primer commit del proyecto'". Seguidamente, se han enviado todos los documentos del repositorio local al repositorio online con "git push origin master".
-Una vez están los repositorios han sido vinculados, ya se pueden ir haciendo commits del proyecto a medida que se van haciendo cambios.
+# Seleccionamos ahora las variables de identificación de los pacientes.
+colData <- data_values_mod[, 1:5]
 
-# Resultados
+# Ahora que ya lo tenemos preparado, creamos el objeto SummarizedExperiment.
+sum_exp_object <- SummarizedExperiment(
+  assays = list(counts = metabolite_data),
+  rowData = rowData,
+  colData = colData
+)
 
-# Discusión y limitaciones y conclusiones del estudio
+# Finalmente vemos qué pinta tiene el objeto creado.
+sum_exp_object
+```
+
+Ahora solo queda guardar el objeto tal y como nos pide el enunciado.
+```{r}
+# Guardamos el objeto en formato .Rda.
+save(sum_exp_object, file = "sum_exp_object.Rda")
+```
+
+## Exploración del dataset PENDIENTE
+
+# Discusión y limitaciones y conclusiones del estudio PENDIENTE
