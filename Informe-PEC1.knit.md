@@ -1,16 +1,14 @@
 ---
 title: "PEC 1"
 author: "Joan Canseco i Ribas"
-date: "`r Sys.Date()`"
+date: "2024-10-30"
 output:
   pdf_document:
     toc: true
     toc_depth: '2'
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 # Abstract PENDIENTE
 En este proyecto, se ha llevado a cabo un análisis estructurado de datos metabolómicos para simular un proceso de análisis ómico. El objetivo ha sido familiarizarse con la organización y manejo de datos ómicos, aplicando diversas herramientas y métodos que se han ido mostrando durante la asignatura de "Análisis de datos ómicos". Para ello, se ha seleccionado un conjunto de datos de un estudio en el que se investiga los metabolitos en respuesta a la cirugía bariátrica en 4 distintos timepoints en 39 pacientes con más de 10 años de obesidad. Estos 39 pacientes están clasificados en dos grupos, un grupo de pacientes que se les aplica cirugía by pass (n=26) y otro que se les aplica cirugía tubular (n=13).
@@ -70,53 +68,62 @@ En este apartado se volcarán los resultados del proyecto.
 
 ## Creación del contenedor del tipo SummarizedExperiment
 El primer paso será asegurarnos de que "BiocManager" está instalado:
-```{r message=FALSE, warning=FALSE}
+
+``` r
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 ```
 
 Posteriormente instalamos desde Bioconductor el paquete "SummarizedExperiment" que es el paquete específico para crear el contendor.
-```{r message=FALSE, warning=FALSE}
+
+``` r
 if (!requireNamespace("SummarizedExperiment", quietly = TRUE)) BiocManager::install("SummarizedExperiment")
 ```
 
 Y lo llamamos con library.
-```{r message=FALSE, warning=FALSE}
+
+``` r
 library("SummarizedExperiment")
 ```
 
 
 Ahora cargamos los datos ("DataValues_S013.csv") y los metadatos ("DataInfo_S013.csv") del dataset que están dentro de la carpeta "2018-MetabotypingPaper".
-```{r}
+
+``` r
 data_values <- read.csv("2018-MetabotypingPaper/DataValues_S013.csv")
 metadata <- read.csv("2018-MetabotypingPaper/DataInfo_S013.csv")
 ```
 
 Observamos estos dos archivos. Posteriormente ya se hará una mejor exploración de los datos en próximos apartados. Dejamos este código en forma de comentarios porque sinó el informe se llena de datos densos.
-```{r}
+
+``` r
 #head(data_values)
 #head(metadata)
 ```
 
 En estos dos documentos hay dos variables iniciales que sobran, ya que son duplicaciones de las columnas adyacentes. Estas columnas son X.1 en "DataValues_S013.csv" y X en "DataInfo_S013.csv", por lo que las vamos a eliminar para que no nos molesten.
-```{r}
+
+``` r
 data_values_mod <- data_values[, 2:696]
 metadata_mod <- metadata[, 2:4]
 ```
 
 Vemos que hay algunas variables identificativas (las 5 primeras) en el documento "DataValues_S013.csv" y el resto son variables experimentales. En el documento "DataInfo_S013.csv" se recoge información de las variables del documento "DataValues_S013.csv". Algunas de las variables son las mismas pero en distintos timepoints por lo que vamos a crear una nueva variable que especifique el timepoint. De esta manera, conseguiremos obtener muestras de manera individual para las variables. Primero nos aseguramos que los paquetes dplyr y tidyr estén instalados.
-```{r message=FALSE, warning=FALSE}
+
+``` r
 if (!requireNamespace("tidyr", quietly = TRUE)) install.packages("tidyr")
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages("dplyr")
 ```
 
 Los llamamos con library.
-```{r message=FALSE, warning=FALSE}
+
+``` r
 library("tidyr")
 library("dplyr")
 ```
 
 Creamos una nueva variable que se llame Timepoint haciendo pivot_longer para así obtener las muestras de manera individual que es lo que nos interesa.
-```{r warning=FALSE}
+
+``` r
 data_values_samples <- data_values_mod %>%
   # Hacemos pivot_longer para transformar el df.
   pivot_longer(
@@ -133,7 +140,8 @@ data_values_samples <- data_values_mod %>%
 ```
 
 Ahora modificamos el metadata para adecuarlo a las nuevas variables. Primero añadimos la nueva fila de timepoints creando un nuevo df.
-```{r}
+
+``` r
 metadata_timepoints <- data.frame(
   VarName = "Timepoint",
   varTpe = "character",
@@ -142,42 +150,60 @@ metadata_timepoints <- data.frame(
 ```
 
 Modificamos las variables del metadata eliminando "_TX" del final y eliminamos variables repetidas.
-```{r}
+
+``` r
 metadata_metabolites <- metadata_mod %>%
   mutate(VarName = gsub("_T[0-5]$", "", VarName)) %>% # Buscamos y eliminamos el "_TX" del final.
   distinct(VarName, .keep_all = TRUE)  # Quitamos las variables repetidas en Varname.
 ```
 
 Finalmente unimos los dos dfs con rbind.
-```{r}
+
+``` r
 # Finalmente unimos los dos dfs con rbind.
 metadata_samples <- rbind(metadata_timepoints, metadata_metabolites)
 ```
 
 Vemos que metadata_samples tiene las mismas filas que columnas tiene data_values_samples que es lo que estábamos buscando.
-```{r}
+
+``` r
 dim(metadata_samples)
+```
+
+```
+## [1] 180   3
+```
+
+``` r
 dim(data_values_samples)
+```
+
+```
+## [1] 156 180
 ```
 
 Una vez modificados ambos documentos, nos quedan los datos separados por muestras individuales cogidas en diferentes timepoints. Ahora ya podemos crear el objeto "SummarizedExperiment".
 Para ello, seleccionamos las variables experimentales (a partir de la variable 7 hasta el final) y creamos una matriz transpuesta llamada "metabolite_data", ya que las filas deben ser las variables y las columnas deben ser las distintas muestras.
-```{r}
+
+``` r
 metabolite_data <- t(as.matrix(data_values_samples[, 7:ncol(data_values_samples)]))
 ```
 
 Creamos rowData a partir de la información de la metadata para especificar la información de las variables experimentales.
-```{r}
+
+``` r
 rowData <- metadata_samples[7:nrow(metadata_samples), ]
 ```
 
 Creamos ColData seleccionando las variables de identificación de los pacientes.
-```{r}
+
+``` r
 colData <- data_values_samples[, 1:6]
 ```
 
 Creamos el objeto *SummarizedExperiment* con los 3 componentes que hemos mencionado.
-```{r}
+
+``` r
 sum_exp_object <- SummarizedExperiment(
   assays = list(counts = metabolite_data),
   rowData = rowData,
@@ -186,12 +212,25 @@ sum_exp_object <- SummarizedExperiment(
 ```
 
 Vemos qué pinta tiene.
-```{r}
+
+``` r
 sum_exp_object
 ```
 
+```
+## class: SummarizedExperiment 
+## dim: 174 156 
+## metadata(0):
+## assays(1): counts
+## rownames(174): MEDDM MEDCOL ... X lysoPC.a.C14.0
+## rowData names(3): VarName varTpe Description
+## colnames: NULL
+## colData names(6): SUBJECTS SURGERY ... Group Timepoint
+```
+
 Vemos que es un objeto con 174 filas (variables experimentales de metabolitos) y 156 columnas, que son las muestras (4 para cada paciente, ya que son 4 timepoints). Se puede estudiar un poco más el objeto con las siguientes funciones, pero las dejaremos como comentarios para que no se muestren unos tochos terribles en el informe.
-```{r}
+
+``` r
 #assay(sum_exp_object) # Devuelve la matriz principal de datos.
 #rowData(sum_exp_object) # Devuelve un df con información sobre los metabolitos 
 #(filas de la matriz).
@@ -200,7 +239,8 @@ Vemos que es un objeto con 174 filas (variables experimentales de metabolitos) y
 ```
 
 Solo queda guardar el objeto tal y como nos pide el enunciado.
-```{r}
+
+``` r
 save(sum_exp_object, file = "sum_exp_object.Rda")
 ```
 
@@ -209,43 +249,133 @@ Empezamos con el análisis de ambos documentos, "DataValues_S013.csv" y "DataInf
 
 ### Análisis preliminar
 Primero haremos una exploración inicial. Cogeremos el documento data_values_samples, en el que hemos transformado los datos para que las filas sean las muestras recogidas (y no los pacientes como antes). Verificaremos las dimensiones del documento para ver si lo que se cumple es cierto.
-```{r}
+
+``` r
 dim(data_values_samples)
 ```
 
+```
+## [1] 156 180
+```
+
 Vemos que es un documento con 156 filas (correspondiente a los 4 timepoints de los 39 pacientes) y 180 columnas (correspondientes a las variables de estudio). Hacemos ahora un resumen estadístico muy básico de las 180 variables para ver qué valores toman y qué tipos de variables tenemos. Es un poco complicado trabajar con este número tan elevado de variables ya que los outputs son enormes, por lo que en este caso tampoco vamos a mostrar el resultado.
-```{r}
+
+``` r
 #summary(data_values_samples)
 ```
 
 También es importante verificar los missings de los datos. Vamos a mirar cuantos missings hay por cada variable.
-```{r}
+
+``` r
 colSums(is.na(data_values_samples))
+```
+
+```
+##       SUBJECTS        SURGERY            AGE         GENDER          Group 
+##              0              0              0              0              0 
+##      Timepoint          MEDDM         MEDCOL         MEDINF         MEDHTA 
+##              0             13             13             15             13 
+##            GLU            INS           HOMA          HBA1C HBA1C.mmol.mol 
+##             11             14             14             91             91 
+##           PESO            bmi             CC           CINT            CAD 
+##             10             10             24             14             14 
+##            TAD            TAS             TG            COL            LDL 
+##             25             25             11             11             18 
+##            HDL           VLDL            PCR            LEP          ADIPO 
+##             13             49             68             68             71 
+##            GOT            GPT            GGT          URICO          CREAT 
+##             12             12             15             16             15 
+##           UREA         HIERRO         TRANSF           FERR            Ile 
+##             15             13             25             16             18 
+##            Leu            Val            Ala            Pro            Gly 
+##             18             18             18             18             18 
+##            Ser            Trp            Phe            Met            Orn 
+##             18             18             18             18             18 
+##            Arg            His            Asn            Asp            Glu 
+##             18             18             18             18             18 
+##            Gln            Cit            Tyr            Thr            Lys 
+##             18             18             18             18             18 
+##     Creatinine     Kynurenine     Putrescine      Sarcosine      Serotonin 
+##             18             18             21             18             18 
+##        Taurine           SDMA             C0             C2          C3.OH 
+##             18             18             18             18             18 
+##   C6..C4.1.DC.  C5.DC..C6.OH.          C7.DC             C8            C10 
+##             18             18             18             18             18 
+##          C10.1          C10.2          C14.1          C14.2          C16.1 
+##             18             18             18             18             18 
+##          C16.2       C16.2.OH          C18.1       C18.1.OH          C18.2 
+##             18             18             18             18             18 
+## lysoPC.a.C16.0 lysoPC.a.C16.1 lysoPC.a.C17.0 lysoPC.a.C18.0 lysoPC.a.C18.1 
+##             18             18             18             18             18 
+## lysoPC.a.C18.2 lysoPC.a.C20.3 lysoPC.a.C20.4 lysoPC.a.C24.0 lysoPC.a.C26.0 
+##             18             18             18             18             18 
+## lysoPC.a.C26.1 lysoPC.a.C28.0 lysoPC.a.C28.1    PC.aa.C24.0    PC.aa.C28.1 
+##             18             18             18             18             18 
+##    PC.aa.C30.0    PC.aa.C32.0    PC.aa.C32.1    PC.aa.C32.3    PC.aa.C34.1 
+##             18             18             18             18             18 
+##    PC.aa.C34.2    PC.aa.C34.3    PC.aa.C34.4    PC.aa.C36.0    PC.aa.C36.1 
+##             18             18             18             18             18 
+##    PC.aa.C36.2    PC.aa.C36.3    PC.aa.C36.4    PC.aa.C36.5    PC.aa.C38.0 
+##             18             18             18             18             18 
+##    PC.aa.C38.1    PC.aa.C38.3    PC.aa.C38.4    PC.aa.C38.5    PC.aa.C38.6 
+##             18             18             18             18             18 
+##    PC.aa.C40.1    PC.aa.C40.2    PC.aa.C40.3    PC.aa.C40.4    PC.aa.C40.5 
+##             18             18             18             18             18 
+##    PC.aa.C40.6    PC.aa.C42.0    PC.aa.C42.1    PC.aa.C42.2    PC.aa.C42.4 
+##             18             18             18             18             18 
+##    PC.aa.C42.5    PC.aa.C42.6    PC.ae.C30.0    PC.ae.C32.1    PC.ae.C32.2 
+##             18             18             18             18             18 
+##    PC.ae.C34.0    PC.ae.C34.1    PC.ae.C34.2    PC.ae.C34.3    PC.ae.C36.0 
+##             18             18             18             18             18 
+##    PC.ae.C36.1    PC.ae.C36.2    PC.ae.C36.3    PC.ae.C36.4    PC.ae.C36.5 
+##             18             18             18             18             18 
+##    PC.ae.C38.0    PC.ae.C38.2    PC.ae.C38.3    PC.ae.C38.4    PC.ae.C38.5 
+##             18             18             18             18             18 
+##    PC.ae.C38.6    PC.ae.C40.1    PC.ae.C40.2    PC.ae.C40.3    PC.ae.C40.4 
+##             18             18             18             18             18 
+##    PC.ae.C40.5    PC.ae.C40.6    PC.ae.C42.1    PC.ae.C42.2    PC.ae.C42.3 
+##             18             18             18             18             18 
+##    PC.ae.C42.4    PC.ae.C42.5    PC.ae.C44.3    PC.ae.C44.4    PC.ae.C44.5 
+##             18             18             18             18             18 
+##    PC.ae.C44.6  SM..OH..C14.1  SM..OH..C16.1  SM..OH..C22.1  SM..OH..C22.2 
+##             18             18             18             18             18 
+##  SM..OH..C24.1       SM.C16.0       SM.C16.1       SM.C18.0       SM.C18.1 
+##             18             18             18             18             18 
+##       SM.C20.2       SM.C24.0       SM.C24.1              X lysoPC.a.C14.0 
+##             18             18             18            156            118
 ```
 Vemos que las variables identificativas están completas, mientras que todas las variables de metabolitos tienen algún missing, aunque en general son pocos (la mayoría tienen menos de 19 missings de 156 valores totales). Además, hay una variable "X" que son todo missings.
 
 ### Análisis de los pacientes
 Como hay muchas variables de metabolitos, haremos una exploración inicial de las variables identificativas de los pacientes, que, como hemos dicho son las 5 primeras variables (excluyendo la variable Timepoint que en este caso no tiene mucho sentido mantenerla porque hace referencia a las muestras).
-```{r}
+
+``` r
 data_values_patients <- data_values_samples %>% 
   select("SUBJECTS", "SURGERY", "AGE", "GENDER", "Group") %>% # Seleccionamos columnas
   distinct() # Eliminamos duplicados de pacientes
 ```
 
 Verificamos que tenemos 39 pacientes en este df.
-```{r}
+
+``` r
 nrow(data_values_patients)
 ```
 
+```
+## [1] 39
+```
+
 Verificamos las variables que deban ser factors realmente sean factors.
-```{r}
+
+``` r
 data_values_patients$SURGERY <- factor(data_values_patients$SURGERY)
 data_values_patients$GENDER <- factor(data_values_patients$GENDER)
 data_values_patients$Group <- factor(data_values_patients$Group)
 ```
 
 Ahora podemos hacer estadística básica con estos datos de los pacientes. Los datos realmente importantes de este df se encuentran en las variables "SURGERY", "AGE", "GENDER" y "Group", ya que "SUBJECTS" solo hace referencia al número de paciente. La variable "AGE" la veremos con un histograma mientras que los factores los veremos con diagramas de barras.
-```{r warning=FALSE}
+
+``` r
 par(mfrow = c(2,2)) # Así podemos ver los 4 gráficos a la vez.
 # Histograma de la edad.
 hist(data_values_patients$AGE, 
@@ -276,8 +406,11 @@ barplot(table(data_values_patients$SURGERY),
         ylim=c(0,30))
 ```
 
+![](Informe-PEC1_files/figure-latex/unnamed-chunk-27-1.pdf)<!-- --> 
+
 Estos gráficos muestran que la mayoría de edades de los participantes están entre los 30 y los 50 años, que hay el doble de mujeres que de hombres, que hay más componentes del grupo 1 que del grupo 2 y que hay más pacientes con cirugía by pass que tubular. Ahora miraremos la relación entre la variable SURGERY (la variable que indica el tipo de cirugía que ha tomado cada paciente) y las demás, ya que la variable SURGERY es la variable clave del estudio.
-```{r}
+
+``` r
 # Separamos los datos según la variable SURGERY.
 split_data <- split(data_values_patients, data_values_patients$SURGERY)
 
@@ -311,21 +444,26 @@ for (surgery_status in names(split_data)) {
 }
 ```
 
+![](Informe-PEC1_files/figure-latex/unnamed-chunk-28-1.pdf)<!-- --> 
+
 Vemos que los grupos son bastante diferentes entre ellos, también probablemente porque la n es relativamente pequeña, aun que no sabemos si puede afectar a nuestros resultados. 
 
 ### Análisis
 Se propone dilucidar que metabolitos varían más desde el T=0 hasta el T=5 (el último timepoint que hay) en cada una de las cirugías (bypass y tubular). Filtramos primero los timepoints 0 y 5.
-```{r}
+
+``` r
 data_values_timepoints <- data_values_samples[data_values_samples$Timepoint %in% c("T0", "T5"), ]
 ```
 
 Creamos un df para almacenar las diferencias de metaboitos entre timepoints.
-```{r}
+
+``` r
 data_values_difference <- data.frame()
 ```
 
 Carlcculamos la diferencia entre metabolitos para cada paciente.
-```{r}
+
+``` r
 for (patient in unique(data_values_timepoints$SUBJECTS)) {
   patient_data <- data_values_timepoints[data_values_timepoints$SUBJECTS == patient, ]
   
