@@ -12,9 +12,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Abstract PENDIENTE
+# Abstract
 En este proyecto, se ha llevado a cabo un análisis estructurado de datos metabolómicos para simular un proceso de análisis ómico. El objetivo ha sido familiarizarse con la organización y manejo de datos ómicos, aplicando diversas herramientas y métodos que se han ido mostrando durante la asignatura de "Análisis de datos ómicos". Para ello, se ha seleccionado un conjunto de datos de un estudio en el que se investiga los metabolitos en respuesta a la cirugía bariátrica en 4 distintos timepoints en 39 pacientes con más de 10 años de obesidad. Estos 39 pacientes están clasificados en dos grupos, un grupo de pacientes que se les aplica cirugía by pass (n=26) y otro que se les aplica cirugía tubular (n=13).
-Estos datos han sido organizados en un contenedor del tipo SummarizedExperiment para facilitar el trabajo con este dataset. Además, se han realizado análisis exploratorios en el que se han reflejado las características más relevantes del proyecto. También se han estudiado las características de los principales grupos de estudio, y  ################ para verificar cuáles son los metabolitos que más cambian al aplicar una u otra cirugía.
+Estos datos han sido organizados en un contenedor del tipo SummarizedExperiment para facilitar el trabajo con este dataset. Además, se han realizado análisis exploratorios en el que se han reflejado las características más relevantes del proyecto. También se han estudiado las características de los principales grupos de estudio, y se han comparado las diferencias de metabolitos entre el timepoint 0 y el timepoint 5 entre los dos tipos principales de cirugías para verificar cuáles son los metabolitos que más cambian al aplicar una u otra cirugía. En esta última prueba se han detectado 9 metabolitos con diferencias significativas entre cirugías.
 Finalmente, se ha creado un repositorio del proyecto en Github donde se han subido todos los documentos del proyecto.
 
 # Objetivos del estudio
@@ -51,13 +51,13 @@ Se han usado principalmente 3 herramientas informáticas y bioinformáticas para
 ## Creación de un contenedor del tipo SummarizedExperiment
 Para la creación del contenedor se ha usado Bioconductor dentro de R (como se ha especificado anteriormente). Los pasos se han especificado en el apartado de Resultados.
 
-## Exploración del dataset PENDIENTE
+## Exploración del dataset
 Para la exploración de los datos se usará principalmente R y Rstudio. Se usará en este proyecto dos documentos:
 
 * "DataValues_S013.csv": Se trata del documento donde hay almacenados los datos experimentales de los pacientes. Es un data frame con 39 filas (de 39 pacientes) y 696 variables. De las 696 variables, las 6 primeras son para identificar a los pacientes (X.1, SUBJECTS, SURGERY, AGE, GENDER y Group, en la que X.1 es un duplicado de SUBJECTS, por lo que realmente se podría considerar solo las 5 primeras columnas), y el resto de variables son los metabolitos tomados en 4 timepoints distintos (T0, T2, T4 y T5). Se denota a qué timepoint hace referencia cada variable porque al final del nombre de cada variable hay especificado el timepoint al que pertenecen con "_TX" (donde X es 0, 2, 4 o 5).
 
 * "DataInfo_S013.csv": Se trata de un documento donde hay la metadata del documento anterior y está organizado de manera distinta. Tiene solo 4 columnas (X, es un duplicado de VarName, VarName, contiene el nombre de cada una de las variables del documento anterior, varTpe, especifica el tipo de variable que es, y Description, especifica qué información se recoge en cada variable) y 695 filas, correspondientes a las 695 variables del documento anterior (recordemos que eran 696 pero la primera columna era un duplicado de la segunda columna, por lo que son 695 efectivas).
-Una exploración más exhaustiva será llevada a cabo en el apartado de Resultados. En esta exploración se realizará un análisis inicial de los datos con dim, head y summary para entender el tipo de datos que hay. Además, se realizarán análisis de componentes principales (PCA)
+Una exploración más exhaustiva será llevada a cabo en el apartado de Resultados. En esta exploración se realizará un análisis inicial de los datos. Además, se estudiarán las variables identificativas de los pacientes, centrando el foco sobretodo en el tipo de cirugía realizada en el paciente. Finalmente, también estudiaremos las diferencias entre el T0 y el T5 entre tipo de cirugía, ya que nos interesa ver como han variado los metabolitos tras la cirugía en un grupo y en otro para saber qué efectos diferentes sucede en una cirugía y en otra.
 
 ## Creación del repositorio Github
 Primeramente, se ha creado un nuevo repositorio online llamado "Canseco-i-Ribas-Joan-PEC1" desde el usuario "CansecoRibas". 
@@ -160,20 +160,20 @@ dim(metadata_samples)
 dim(data_values_samples)
 ```
 
-Una vez modificados ambos documentos, nos quedan los datos separados por muestras individuales cogidas en diferentes timepoints. Ahora ya podemos crear el objeto "SummarizedExperiment".
-Para ello, seleccionamos las variables experimentales (a partir de la variable 7 hasta el final) y creamos una matriz transpuesta llamada "metabolite_data", ya que las filas deben ser las variables y las columnas deben ser las distintas muestras.
+Una vez modificados ambos documentos, nos quedan los datos separados por muestras individuales cogidas en diferentes timepoints. Ahora ya podemos crear el objeto "SummarizedExperiment". Vemos también que las 4 columnas posteriores a las 6 columnas identificativas de muestra también recogen un factor asociado a la muestra, por lo que también sería interesante sacarlas del metabolite_data.
+Para ello, seleccionamos las variables experimentales (a partir de la variable 11 hasta el final) y creamos una matriz transpuesta llamada "metabolite_data", ya que las filas deben ser las variables y las columnas deben ser las distintas muestras.
 ```{r}
-metabolite_data <- t(as.matrix(data_values_samples[, 7:ncol(data_values_samples)]))
+metabolite_data <- t(as.matrix(data_values_samples[, 11:ncol(data_values_samples)]))
 ```
 
 Creamos rowData a partir de la información de la metadata para especificar la información de las variables experimentales.
 ```{r}
-rowData <- metadata_samples[7:nrow(metadata_samples), ]
+rowData <- metadata_samples[11:nrow(metadata_samples), ]
 ```
 
 Creamos ColData seleccionando las variables de identificación de los pacientes.
 ```{r}
-colData <- data_values_samples[, 1:6]
+colData <- data_values_samples[, 1:10]
 ```
 
 Creamos el objeto *SummarizedExperiment* con los 3 componentes que hemos mencionado.
@@ -204,7 +204,7 @@ Solo queda guardar el objeto tal y como nos pide el enunciado.
 save(sum_exp_object, file = "sum_exp_object.Rda")
 ```
 
-## Exploración del dataset PENDIENTE
+## Exploración del dataset
 Empezamos con el análisis de ambos documentos, "DataValues_S013.csv" y "DataInfo_S013.csv". Como se ha indicado anteriormente, el primero contiene los datos en relación a los metabolitos recogidos en muestras de 4 distintos timepoints de 39 pacientes, y el segundo contiene la explicación de las características de las variables y su información. Por lo que nos fijaremos para hacer los análisis en el primer documento ("DataValues_S013.csv").
 
 ### Análisis preliminar
@@ -222,7 +222,11 @@ También es importante verificar los missings de los datos. Vamos a mirar cuanto
 ```{r}
 colSums(is.na(data_values_samples))
 ```
-Vemos que las variables identificativas están completas, mientras que todas las variables de metabolitos tienen algún missing, aunque en general son pocos (la mayoría tienen menos de 19 missings de 156 valores totales). Además, hay una variable "X" que son todo missings.
+Vemos que las variables identificativas están completas, mientras que todas las variables de metabolitos tienen algún missing, aunque en general son pocos (la mayoría tienen menos de 19 missings de 156 valores totales). Además, hay una variable "X" que son todo missings, por lo que la podemos eliminar.
+```{r}
+data_values_samples <- data_values_samples[, -which(names(data_values_samples) == "X")]
+```
+
 
 ### Análisis de los pacientes
 Como hay muchas variables de metabolitos, haremos una exploración inicial de las variables identificativas de los pacientes, que, como hemos dicho son las 5 primeras variables (excluyendo la variable Timepoint que en este caso no tiene mucho sentido mantenerla porque hace referencia a las muestras).
@@ -314,9 +318,16 @@ for (surgery_status in names(split_data)) {
 Vemos que los grupos son bastante diferentes entre ellos, también probablemente porque la n es relativamente pequeña, aun que no sabemos si puede afectar a nuestros resultados. 
 
 ### Análisis
-Se propone dilucidar que metabolitos varían más desde el T=0 hasta el T=5 (el último timepoint que hay) en cada una de las cirugías (bypass y tubular). Filtramos primero los timepoints 0 y 5.
+Se propone dilucidar qué metabolitos varían más desde el T=0 hasta el T=5 (el último timepoint que hay) en cada una de las cirugías (bypass y tubular). Para ver eso, primero vamos a verificar que las columnas de metabolitos sean numéricas, y sinó, las eliminaremos para este análisis.
 ```{r}
-data_values_timepoints <- data_values_samples[data_values_samples$Timepoint %in% c("T0", "T5"), ]
+numeric_cols <- sapply(data_values_samples, is.numeric)
+data_values_samples_num <- data_values_samples[, numeric_cols | colnames(data_values_samples) %in% c("SUBJECTS", "SURGERY", "AGE", "GENDER", "Group", "Timepoint", "MEDDM", "MEDCOL", "MEDINF", "MEDHTA")]
+```
+
+
+Parece que todas ellas son numéricas. Nos quedamos solo con las muestras de los timepoints 0 y 5. También eliminamos las columnas "MEDDM", "MEDCOL", "MEDINF" y "MEDHTA", ya que son factores asociados a las muestras, que para este análisis no nos van a interesar.
+```{r}
+data_values_timepoints <- data_values_samples_num[data_values_samples_num$Timepoint %in% c("T0", "T5"), -c(7:10)]
 ```
 
 Creamos un df para almacenar las diferencias de metaboitos entre timepoints.
@@ -324,40 +335,97 @@ Creamos un df para almacenar las diferencias de metaboitos entre timepoints.
 data_values_difference <- data.frame()
 ```
 
-Carlcculamos la diferencia entre metabolitos para cada paciente.
-```{r}
+Calculamos la diferencia entre metabolitos para cada paciente (columnas 7 hasta el final).
+```{r warning=FALSE}
 for (patient in unique(data_values_timepoints$SUBJECTS)) {
   patient_data <- data_values_timepoints[data_values_timepoints$SUBJECTS == patient, ]
   
-  # Solo si hay valores en ambos timepoints.
-  if (all(c(0, 4) %in% patient_data$Timepoint)) {
-    # Obtener las filas para timepoint 0 y 5.
+  # Verificamos que los pacientes tengan ambos timepoints.
+  if (all(c("T0", "T5") %in% patient_data$Timepoint)) {
     tp0 <- patient_data[patient_data$Timepoint == "T0", ]
-    tp4 <- patient_data[patient_data$Timepoint == "T5", ]
+    tp5 <- patient_data[patient_data$Timepoint == "T5", ]
     
-    # Calcular las diferencias de cada metabolito entre tp4 y tp0.
+    # Copiamos tp5 a diff_row.
     diff_row <- tp5
-    diff_row[ , names(tp5) %in% colnames(data_values_samples)[-(1:3)]] <- tp4[ , -(1:3)] - tp0[ , -(1:3)]
-    diff_row$Timepoint <- "Difference"
+    # Computamos diferencias en metabolitos entre t5 y t0.
+    diff_row[, 7:ncol(tp5)] <- tp5[, 7:ncol(tp5)] - tp0[, 7:ncol(tp0)]
+    # Establecemos valor de columna Timepoint.
+    diff_row$Timepoint <- "Difference between T5 and T0"
     
-    # Añadir a data_values_difference
+    # Unimos dfs.
     data_values_difference <- rbind(data_values_difference, diff_row)
   }
 }
-
-# Comparar diferencias entre tipos de cirugía
-# Supongamos que los metabolitos son: Metabolite1, Metabolite2, ..., MetaboliteN
-metabolite_columns <- colnames(data_values_samples)[-(1:3)] # Asume que las primeras tres columnas son IDs y Timepoint
-
-#for (metabolite in metabolite_columns) {
-  # Comparación estadística para el metabolito entre tipos de cirugía
-  #bypass_values <- data_values_difference[data_values_difference$Surgery_Type == "bypass", metabolite]
-  #tubular_values <- data_values_difference[data_values_difference$Surgery_Type == "tubular", metabolite]
-  
-  # Prueba estadística (ajusta a t-test o Wilcoxon según la distribución de los datos)
-  #test_result <- t.test(bypass_values, tubular_values)
-#}
 ```
 
+Creamos vector con los nombres de las columnas de los metabolitos.
+```{r}
+metabolite_columns <- colnames(data_values_samples_num)[11:ncol(data_values_samples_num)]  
+```
 
-# Discusión y limitaciones y conclusiones del estudio PENDIENTE
+Cremos un df para almacenar los resultados significativos.
+```{r}
+significant_results <- data.frame(Metabolite = character(), 
+                                  Test = character(),
+                                  p_value = numeric(), 
+                                  stringsAsFactors = FALSE)
+```
+
+Para cada metabolito comparamos los valores de las diferencias entre el T0 y el T5 entre ambos grupos (by pass y tubular) usando un t-test (en caso de normalidad de los datos) o un test de Wilcoxon (en caso de no normalidad de los datos). Posteriormente calculamos las medias de cada uno de los grupos, y en caso de que el test calculado muestre diferencias significativas del metabolito entre grupos, se reflejará en el df creado como "significant_results".
+```{r warning=FALSE}
+for (metabolite in metabolite_columns) {
+  # Dividimos las diferencias por tipo de cirugía y eliminamos los NA.
+  bypass_values <- na.omit(data_values_difference[data_values_difference$SURGERY == "by pass", metabolite])[[1]]
+  tubular_values <- na.omit(data_values_difference[data_values_difference$SURGERY == "tubular", metabolite])[[1]]
+  
+  # Verificamos que tengan más de una muestra.
+  if (length(bypass_values) > 1 & length(tubular_values) > 1) {
+    # Prueba de normalidad.
+    normality_test <- shapiro.test(c(bypass_values, tubular_values))$p.value > 0.05
+    
+    # Realizamos una prueba u otra según los resultados de normalidad.
+    if (normality_test) {
+      test_result <- t.test(bypass_values, tubular_values)
+      test_type <- "t-test"
+    } else {
+      test_result <- wilcox.test(bypass_values, tubular_values)
+      test_type <- "Wilcoxon"
+    }
+    
+    # Calculamos las medias de cada grupo.
+    mean_bypass <- mean(bypass_values, na.rm = TRUE)
+    mean_tubular <- mean(tubular_values, na.rm = TRUE)
+    
+    # Guardamos solo los resultados si el test es significativo.
+    if (test_result$p.value < 0.05) {
+      significant_results <- rbind(significant_results, 
+                                   data.frame(Metabolite = metabolite, 
+                                              Test = test_type,
+                                              p_value = test_result$p.value,
+                                              Media_bypass = mean_bypass,
+                                              Media_tubular = mean_tubular))
+    }
+  }
+}
+```
+
+Finalmente, mostramos los resultados obtenidos.
+```{r}
+significant_results
+```
+Solo se han encontrado diferencias entre grupos en las diferencias de lo metabolitos "TG", "COL", "C10", "C10.1", "C14.1", "C14.2", "C16.1", "IysoPC.a.C17.0" y "IysoPC.a.C18.0", y en todos ellos en el grupo bypass hay valores inferiores de diferencia respecto al grupo tubular.
+ 
+
+# Discusión y limitaciones y conclusiones del estudio
+En esta actividad se ha seleccionado un dataset de un estudio de 39 pacientes con más de 10 años de obesidad a los que se les ha realizado una cirugía bariátrica. Se ha clasificado el dataset en 2 grupos según la cirugía bariátrica recibida: grupo "by pass" compuesto por 26 pacientes y grupo "tubular" compuesto por 13 pacientes. En estos pacientes se ha pretendido estudiar como evolucionan ciertos metabolitos en 4 distintos timepoints tras la cirugía según qué cirugía hayan tomado. 
+Se ha creado un contenedor del tipo SummarizedExperiment para poder facilitar análisis posteriores de los datos. Posteriormente, se ha hecho un análisis inicial que indicaba que había 156 muestras de 39 pacienes y 180 variables, y que en general es un documento con pocos missings, algo importante para posteriores análisis. Después se han estudiado las variables relacionadas con los pacientes y hemos detectado diferencias visuales entre ambos grupos de cirugía, lo que podría significar que los grupos de los pacientes tengan caracterísitcas basales distintas. También se ha hecho un análisis para ver los metabolitos que evolucionan de manera distinta entre el tiempo 0 y el tiempo 5 entre los dos tipos de cirugías, y hemos visto que los metabolitos "TG", "COL", "C10", "C10.1", "C14.1", "C14.2", "C16.1", "IysoPC.a.C17.0" y "IysoPC.a.C18.0" tienen valores inferiores de diferencia en el grupo bypass respecto al grupo tubular. Una limitación importante del estudio ha sido los pocos pacientes que había para cada cirugía (by pass n =26; tubular n=13), lo que no ha permitido hacer comparaciones más avanzadas. Finalmente, se ha creado un repositorio y se han colgado todos los documentos:
+
+<https://github.com/CansecoRibas/Canseco-i-Ribas-Joan-PEC1>
+
+
+
+
+
+
+
+
