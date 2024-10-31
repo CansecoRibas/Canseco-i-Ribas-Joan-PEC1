@@ -13,8 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Abstract
-En este proyecto, se ha llevado a cabo un análisis estructurado de datos metabolómicos para simular un proceso de análisis ómico. El objetivo ha sido familiarizarse con la organización y manejo de datos ómicos, aplicando diversas herramientas y métodos que se han ido mostrando durante la asignatura de "Análisis de datos ómicos". Para ello, se ha seleccionado un conjunto de datos de un estudio en el que se investiga los metabolitos en respuesta a la cirugía bariátrica en 4 distintos timepoints en 39 pacientes con más de 10 años de obesidad. Estos 39 pacientes están clasificados en dos grupos, un grupo de pacientes que se les aplica cirugía by pass (n=26) y otro que se les aplica cirugía tubular (n=13).
-Estos datos han sido organizados en un contenedor del tipo SummarizedExperiment para facilitar el trabajo con este dataset. Además, se han realizado análisis exploratorios en el que se han reflejado las características más relevantes del proyecto. También se han estudiado las características de los principales grupos de estudio, y se han comparado las diferencias de metabolitos entre el timepoint 0 y el timepoint 5 entre los dos tipos principales de cirugías para verificar cuáles son los metabolitos que más cambian al aplicar una u otra cirugía. En esta última prueba se han detectado 9 metabolitos con diferencias significativas entre cirugías.
+En este proyecto, se ha llevado a cabo un análisis estructurado de datos metabolómicos para simular un proceso de análisis ómico. El objetivo ha sido familiarizarse con la organización y manejo de datos ómicos, aplicando diversas herramientas y métodos que se han ido mostrando durante la asignatura de "Análisis de datos ómicos". Para ello, se ha seleccionado un conjunto de datos de un estudio en el que se investigaron los metabolitos en respuesta a la cirugía bariátrica en 4 distintos timepoints en 39 pacientes con más de 10 años de obesidad. Estos 39 pacientes fueron clasificados en dos grupos, un grupo de pacientes que se les aplicaba cirugía by pass (n=26) y otro que se les aplicaba cirugía tubular (n=13).
+
+Estos datos han sido organizados en un contenedor del tipo SummarizedExperiment para facilitar el trabajo con este dataset. Además, se han realizado análisis exploratorios en el que se han reflejado las características más relevantes del proyecto. También se han estudiado las características de los principales grupos de estudio, y se han comparado las diferencias de metabolitos entre el timepoint 0 y el timepoint 5 entre los dos tipos principales de cirugías para verificar cuáles son los metabolitos que más cambiaron al aplicar una u otra cirugía. En esta última prueba se han detectado 9 metabolitos con diferencias significativas entre cirugías.
 Finalmente, se ha creado un repositorio del proyecto en Github donde se han subido todos los documentos del proyecto.
 
 # Objetivos del estudio
@@ -36,7 +37,9 @@ Esta actividad se ha desarrollado desde un ordenador Windows.
 
 ## Origen y naturaleza de los datos
 Los datos analizados han sido extraídos del siguiente repositorio online: <https://github.com/nutrimetabolomics/metaboData/>
+
 Una vez accedemos a dicho repositorio, clicamos el botón verde "<> Code", y clicamos la opción "Download ZIP". Una vez se ha descargado el repositorio en nuestro ordenador, clicamos botón derecho y seleccionamos "Extraer todo". Exploramos los distintos datasets y seleccionamos el dataset "2018-MetabotypingPaper" porque tiene los documentos bien estructurados y parece que se puede trabajar bien con él. Cogemos los documentos de dicho dataset y los llevamos a nuestro directorio de trabajo de la PEC1. 
+
 Se trata de un dataset de un estudio de 39 pacientes con más de 10 años de obesidad a los que se les ha realizado una cirugía bariátrica. Se clasifica el dataset en 2 grupos según la cirugía bariátrica recibida: grupo "by pass" compuesto por 26 pacientes y grupo "tubular" compuesto por 13 pacientes. También se recoge su estado metabólico, en cuanto a si los pacientes estaban sanos o enfermos metabólicamente en la variable Group. En estos pacientes se pretende estudiar como evolucionan ciertos metabolitos en 4 distintos timepoints tras la cirugía según qué cirugía hayan tomado. 
 
 ## Herramientas informáticas
@@ -52,29 +55,33 @@ Se han usado principalmente 3 herramientas informáticas y bioinformáticas para
 Para la creación del contenedor se ha usado Bioconductor dentro de R (como se ha especificado anteriormente). Los pasos se han especificado en el apartado de Resultados.
 
 ## Exploración del dataset
-Para la exploración de los datos se usará principalmente R y Rstudio. Se usará en este proyecto dos documentos:
+Para la exploración de los datos se ha usado principalmente R y Rstudio. Los documentos donde hay los datos han sido:
 
 * "DataValues_S013.csv": Se trata del documento donde hay almacenados los datos experimentales de los pacientes. Es un data frame con 39 filas (de 39 pacientes) y 696 variables. De las 696 variables, las 6 primeras son para identificar a los pacientes (X.1, SUBJECTS, SURGERY, AGE, GENDER y Group, en la que X.1 es un duplicado de SUBJECTS, por lo que realmente se podría considerar solo las 5 primeras columnas), y el resto de variables son los metabolitos tomados en 4 timepoints distintos (T0, T2, T4 y T5). Se denota a qué timepoint hace referencia cada variable porque al final del nombre de cada variable hay especificado el timepoint al que pertenecen con "_TX" (donde X es 0, 2, 4 o 5).
 
 * "DataInfo_S013.csv": Se trata de un documento donde hay la metadata del documento anterior y está organizado de manera distinta. Tiene solo 4 columnas (X, es un duplicado de VarName, VarName, contiene el nombre de cada una de las variables del documento anterior, varTpe, especifica el tipo de variable que es, y Description, especifica qué información se recoge en cada variable) y 695 filas, correspondientes a las 695 variables del documento anterior (recordemos que eran 696 pero la primera columna era un duplicado de la segunda columna, por lo que son 695 efectivas).
-Una exploración más exhaustiva será llevada a cabo en el apartado de Resultados. En esta exploración se realizará un análisis inicial de los datos. Además, se estudiarán las variables identificativas de los pacientes, centrando el foco sobretodo en el tipo de cirugía realizada en el paciente. Finalmente, también estudiaremos las diferencias entre el T0 y el T5 entre tipo de cirugía, ya que nos interesa ver como han variado los metabolitos tras la cirugía en un grupo y en otro para saber qué efectos diferentes sucede en una cirugía y en otra.
+
+Una exploración más exhaustiva se ha llevado a cabo en el apartado de Resultados. En esta exploración se ha realizado un análisis inicial de los datos. Además, se han estudiado las variables identificativas de los pacientes, centrando el foco sobretodo en el tipo de cirugía realizada en el paciente. Finalmente, también se ha estudiado las diferencias entre el T0 y el T5 entre tipo de cirugía, ya que nos interesa ver como han variado los metabolitos tras la cirugía en un grupo y en otro para saber qué efectos diferentes hay en una cirugía y en otra.
 
 ## Creación del repositorio Github
 Primeramente, se ha creado un nuevo repositorio online llamado "Canseco-i-Ribas-Joan-PEC1" desde el usuario "CansecoRibas". 
+
 Dentro del directorio local del proyecto (donde hay todos los documentos que se han ido mencionando en la parte de "Materiales y Métodos"), se ha creado primeramente un proyecto de R, para facilitar el trabajo con estos documentos. Posteriormente, y desde la Terminal de Rstudio, se ha creado un repositorio local Git usando el comando "git init". Después se ha establecido conexión con el repositorio online con "git remote add origin https://github.com/CansecoRibas/Canseco-i-Ribas-Joan-PEC1.git". Se han añadido todos los documentos al área de ensayo con "git add ." y se ha hecho el primer commit con "git commit -m 'Primer commit del proyecto'". Seguidamente, se han enviado todos los documentos del repositorio local al repositorio online con "git push origin master".
+
 Una vez se han vinculados los repositorios, se han ido haciendo commits a medida que se ha ido avanzando en el proyecto.
+
 Se puede acceder al repositorio online desde: <https://github.com/CansecoRibas/Canseco-i-Ribas-Joan-PEC1>
 
 # Resultados
 En este apartado se volcarán los resultados del proyecto.
 
 ## Creación del contenedor del tipo SummarizedExperiment
-El primer paso será asegurarnos de que "BiocManager" está instalado:
+El primer paso ha sido asegurarnos de que "BiocManager" está instalado:
 ```{r message=FALSE, warning=FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 ```
 
-Posteriormente instalamos desde Bioconductor el paquete "SummarizedExperiment" que es el paquete específico para crear el contendor.
+Posteriormente se ha instalado desde Bioconductor el paquete "SummarizedExperiment" que es el paquete específico para crear el contendor.
 ```{r message=FALSE, warning=FALSE}
 if (!requireNamespace("SummarizedExperiment", quietly = TRUE)) BiocManager::install("SummarizedExperiment")
 ```
@@ -91,7 +98,7 @@ data_values <- read.csv("2018-MetabotypingPaper/DataValues_S013.csv")
 metadata <- read.csv("2018-MetabotypingPaper/DataInfo_S013.csv")
 ```
 
-Observamos estos dos archivos. Posteriormente ya se hará una mejor exploración de los datos en próximos apartados. Dejamos este código en forma de comentarios porque sinó el informe se llena de datos densos.
+Observamos estos dos archivos. En próximos apartados se ha hecho una mejor exploración de los datos. Dejamos este código en forma de comentarios porque sinó el informe se llena de datos densos.
 ```{r}
 #head(data_values)
 #head(metadata)
@@ -103,7 +110,7 @@ data_values_mod <- data_values[, 2:696]
 metadata_mod <- metadata[, 2:4]
 ```
 
-Vemos que hay algunas variables identificativas (las 5 primeras) en el documento "DataValues_S013.csv" y el resto son variables experimentales. En el documento "DataInfo_S013.csv" se recoge información de las variables del documento "DataValues_S013.csv". Algunas de las variables son las mismas pero en distintos timepoints por lo que vamos a crear una nueva variable que especifique el timepoint. De esta manera, conseguiremos obtener muestras de manera individual para las variables. Primero nos aseguramos que los paquetes dplyr y tidyr estén instalados.
+Vemos que hay algunas variables identificativas (las 5 primeras) en el documento "DataValues_S013.csv" y el resto son variables relacionadas con las muestras. En el documento "DataInfo_S013.csv" se recoge información de las variables del documento "DataValues_S013.csv". Algunas de las variables son las mismas pero en distintos timepoints por lo que vamos a crear una nueva variable que especifique el timepoint. De esta manera, conseguiremos obtener muestras de manera individual para las variables. Primero nos aseguramos que los paquetes dplyr y tidyr estén instalados.
 ```{r message=FALSE, warning=FALSE}
 if (!requireNamespace("tidyr", quietly = TRUE)) install.packages("tidyr")
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages("dplyr")
@@ -160,7 +167,8 @@ dim(metadata_samples)
 dim(data_values_samples)
 ```
 
-Una vez modificados ambos documentos, nos quedan los datos separados por muestras individuales cogidas en diferentes timepoints. Ahora ya podemos crear el objeto "SummarizedExperiment". Vemos también que las 4 columnas posteriores a las 6 columnas identificativas de muestra también recogen un factor asociado a la muestra, por lo que también sería interesante sacarlas del metabolite_data.
+Una vez modificados ambos documentos, nos quedan los datos separados por muestras individuales cogidas en diferentes timepoints. Ahora ya podemos crear el objeto "SummarizedExperiment". Vemos también que las 4 columnas posteriores a las 6 columnas identificativas de muestra (5 columnas iniciales + columna Timepoint) también recogen un factor asociado a la muestra, por lo que también sería interesante sacarlas del metabolite_data.
+
 Para ello, seleccionamos las variables experimentales (a partir de la variable 11 hasta el final) y creamos una matriz transpuesta llamada "metabolite_data", ya que las filas deben ser las variables y las columnas deben ser las distintas muestras.
 ```{r}
 metabolite_data <- t(as.matrix(data_values_samples[, 11:ncol(data_values_samples)]))
@@ -208,7 +216,7 @@ save(sum_exp_object, file = "sum_exp_object.Rda")
 Empezamos con el análisis de ambos documentos, "DataValues_S013.csv" y "DataInfo_S013.csv". Como se ha indicado anteriormente, el primero contiene los datos en relación a los metabolitos recogidos en muestras de 4 distintos timepoints de 39 pacientes, y el segundo contiene la explicación de las características de las variables y su información. Por lo que nos fijaremos para hacer los análisis en el primer documento ("DataValues_S013.csv").
 
 ### Análisis preliminar
-Primero haremos una exploración inicial. Cogeremos el documento data_values_samples, en el que hemos transformado los datos para que las filas sean las muestras recogidas (y no los pacientes como antes). Verificaremos las dimensiones del documento para ver si lo que se cumple es cierto.
+Primero se ha hecho una exploración inicial. Se ha cogido el documento data_values_samples, en el que hemos transformado los datos para que las filas sean las muestras recogidas (y no los pacientes como antes). Verificaremos las dimensiones del documento para ver si lo que se cumple es cierto.
 ```{r}
 dim(data_values_samples)
 ```
@@ -222,11 +230,11 @@ También es importante verificar los missings de los datos. Vamos a mirar cuanto
 ```{r}
 colSums(is.na(data_values_samples))
 ```
+
 Vemos que las variables identificativas están completas, mientras que todas las variables de metabolitos tienen algún missing, aunque en general son pocos (la mayoría tienen menos de 19 missings de 156 valores totales). Además, hay una variable "X" que son todo missings, por lo que la podemos eliminar.
 ```{r}
 data_values_samples <- data_values_samples[, -which(names(data_values_samples) == "X")]
 ```
-
 
 ### Análisis de los pacientes
 Como hay muchas variables de metabolitos, haremos una exploración inicial de las variables identificativas de los pacientes, que, como hemos dicho son las 5 primeras variables (excluyendo la variable Timepoint que en este caso no tiene mucho sentido mantenerla porque hace referencia a las muestras).
@@ -324,7 +332,6 @@ numeric_cols <- sapply(data_values_samples, is.numeric)
 data_values_samples_num <- data_values_samples[, numeric_cols | colnames(data_values_samples) %in% c("SUBJECTS", "SURGERY", "AGE", "GENDER", "Group", "Timepoint", "MEDDM", "MEDCOL", "MEDINF", "MEDHTA")]
 ```
 
-
 Parece que todas ellas son numéricas. Nos quedamos solo con las muestras de los timepoints 0 y 5. También eliminamos las columnas "MEDDM", "MEDCOL", "MEDINF" y "MEDHTA", ya que son factores asociados a las muestras, que para este análisis no nos van a interesar.
 ```{r}
 data_values_timepoints <- data_values_samples_num[data_values_samples_num$Timepoint %in% c("T0", "T5"), -c(7:10)]
@@ -413,14 +420,22 @@ Finalmente, mostramos los resultados obtenidos.
 ```{r}
 significant_results
 ```
+
 Solo se han encontrado diferencias entre grupos en las diferencias de lo metabolitos "TG", "COL", "C10", "C10.1", "C14.1", "C14.2", "C16.1", "IysoPC.a.C17.0" y "IysoPC.a.C18.0", y en todos ellos en el grupo bypass hay valores inferiores de diferencia respecto al grupo tubular.
  
 
 # Discusión y limitaciones y conclusiones del estudio
-En esta actividad se ha seleccionado un dataset de un estudio de 39 pacientes con más de 10 años de obesidad a los que se les ha realizado una cirugía bariátrica. Se ha clasificado el dataset en 2 grupos según la cirugía bariátrica recibida: grupo "by pass" compuesto por 26 pacientes y grupo "tubular" compuesto por 13 pacientes. En estos pacientes se ha pretendido estudiar como evolucionan ciertos metabolitos en 4 distintos timepoints tras la cirugía según qué cirugía hayan tomado. 
-Se ha creado un contenedor del tipo SummarizedExperiment para poder facilitar análisis posteriores de los datos. Posteriormente, se ha hecho un análisis inicial que indicaba que había 156 muestras de 39 pacienes y 180 variables, y que en general es un documento con pocos missings, algo importante para posteriores análisis. Después se han estudiado las variables relacionadas con los pacientes y hemos detectado diferencias visuales entre ambos grupos de cirugía, lo que podría significar que los grupos de los pacientes tengan caracterísitcas basales distintas. También se ha hecho un análisis para ver los metabolitos que evolucionan de manera distinta entre el tiempo 0 y el tiempo 5 entre los dos tipos de cirugías, y hemos visto que los metabolitos "TG", "COL", "C10", "C10.1", "C14.1", "C14.2", "C16.1", "IysoPC.a.C17.0" y "IysoPC.a.C18.0" tienen valores inferiores de diferencia en el grupo bypass respecto al grupo tubular. Una limitación importante del estudio ha sido los pocos pacientes que había para cada cirugía (by pass n =26; tubular n=13), lo que no ha permitido hacer comparaciones más avanzadas. Finalmente, se ha creado un repositorio y se han colgado todos los documentos:
+En esta actividad se ha analizado un dataset de un estudio con 39 pacientes que llevaban más de 10 años con obesidad y que fueron sometidos a cirugía bariátrica. Se clasificaron en dos grupos en función del tipo de cirugía recibida: el grupo “by pass” con 26 pacientes y el grupo “tubular” con 13 pacientes. El objetivo fue estudiar cómo evolucionan ciertos metabolitos en cuatro timepoints después de la intervención, considerando el tipo de cirugía.
 
-<https://github.com/CansecoRibas/Canseco-i-Ribas-Joan-PEC1>
+Para facilitar los análisis, se ha organizado la información en un contenedor tipo SummarizedExperiment, permitiendo una gestión estructurada de datos y metadatos. El análisis inicial del dataset ha mostrado que contenía 156 muestras correspondientes a 39 pacientes y 180 variables, con escasa cantidad de valores faltantes, lo cual es positivo para asegurar la validez de futuros análisis. Además, se han revisado las características basales entre los dos grupos, y se han identificado posibles diferencias visuales que podrían indicar perfiles iniciales distintos entre grupos, pero faltaría más análisis para confirmarlo.
+
+En el análisis de metabolitos, se han observado diferencias significativas en la evolución entre el tiempo 0 y el tiempo 5 entre ambas cirugías. Los metabolitos “TG”, “COL”, “C10”, “C10.1”, “C14.1”, “C14.2”, “C16.1”, “LysoPC.a.C17.0” y “LysoPC.a.C18.0” han mostrado valores inferiores en el grupo by pass en comparación con el grupo tubular, lo que sugiere que podrían existir patrones de cambio diferentes según el tipo de cirugía.
+
+Una limitación importante de este estudio es el reducido tamaño muestral en cada grupo de cirugía (by pass, n=26; tubular, n=13), y que en algunas muestras hay datos faltantes, lo que restringe la robustez de las comparaciones, dificultando análisis estadísticos más avanzados y la generalización de los resultados. Quizás se podrían reclutar más pacientes para futuros análisis.
+
+Finalmente, se ha creado un repositorio en GitHub con todos los documentos relacionados con este análisis, disponible en el siguiente enlace:
+
+<https://github.com/CansecoRibas/Canseco-i-Ribas-Joan-PEC1.>
 
 
 
